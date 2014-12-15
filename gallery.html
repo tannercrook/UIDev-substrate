@@ -1,0 +1,90 @@
+<!-- TANNER CROOK (c)2014-->
+
+<!-- This is my response to the test for web developer talent pool employment. I have been busy
+and did not have a lot of time to make it very pretty on the front end and simply made it functional.
+This was also a refresher on javascript as I have not worked with it for quite some time. -->
+
+<html>
+<head>
+	<title>This is a Responsive Image Gallery</title>
+	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script src="http://code.jquery.com/ui/1.11.0/jquery-ui.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style1.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="style1.css" media="screen and (max-width: 480px)">
+	<script>
+	// Create an array to hold photos
+	var galleryPhotos = [];
+	var galleryTitle;
+
+	// step counter
+	var step = 0;
+
+	
+	// Create request function for JSON object.
+
+	getData();
+
+	// FUNCTIONS =============================================
+
+	// Get data from the JSON file for initial load
+	function getData() {
+		$.getJSON('gallery.json', function(data) {
+			console.log('success');
+			process(data);
+		});
+	}
+
+	function process(data) {						// Process the data from the JSON file
+		galleryTitle = data['gallery-title'];
+		document.getElementById("title").innerHTML="<h2>" + galleryTitle + "</h2>";		// get the gallery title from JSON data
+		for (var i = 0; i < data['photos'].length; i++) {								// get the array of photos
+			galleryPhotos[i] = data['photos'][i];
+		}
+		printViewer(galleryPhotos, 0);	// print the images and info to the page
+	}
+
+	function printViewer(photos, index) {			// Print the image & information
+		document.getElementById("viewer").innerHTML="<img src='" + photos[index].src + "'>";			// Add photo to page
+		document.getElementById("photoInfo").innerHTML="<h3>Title: " + photos[index].title + "</h3>";	// Add title to page
+	}
+	
+	function updateViewer(index) {					// Update the image after the 'next' button onclick
+		$.getJSON('gallery.json', function(data) {
+			for (var i = 0; i < data['photos'].length; i++) {  // for every image in the array, assign to new array
+				galleryPhotos[i] = data['photos'][i];
+			}
+		});
+		printViewer(galleryPhotos, index);
+	}
+
+	// Slide to the next photo
+	function slidePhoto() {
+		if (step < galleryPhotos.length-1) { // if the photo is not on the second to the last photo
+			step++;							// increment the step 
+			updateViewer(step);				// update the photo to reflect the next photo
+		}
+		else {
+			step = 0;						// if the photo is on the last photo set step back to 0
+			updateViewer(step);				// update to reflect the last photo
+		}
+	}
+	</script>
+</head>
+<body>
+	<main>
+		<div id="title">
+		</div>
+		<div id="mainContent">
+		<div id="buttons">
+			<br>
+			<button onclick="slidePhoto()">Next</button>
+		</div>
+		<div id="photoInfo">
+		</div>
+		<div id="viewer">
+		</div>
+	</div>
+		<br>
+	</main>
+</body>
+</html>
